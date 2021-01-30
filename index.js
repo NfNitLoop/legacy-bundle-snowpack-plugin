@@ -41,29 +41,30 @@ module.exports = function (snowpackConfig, pluginOptions) {
 
       const fullPath = path.join(buildDirectory, options.filePath)
 
-      if (fs.existsSync(fullPath)) {
-        let transpiled = await babel.transformFileAsync(
-          fullPath,
-          options.babelOptions,
-        )
-
-        const inputOptions = {
-          input: fullPath,
-          plugins: [
-            commonjs(),
-          ],
-        }
-
-        const outputOptions = {
-          format: 'iife',
-          file: fullPath
-        }
-
-        const bundle = await rollup.rollup(inputOptions)
-
-        await bundle.write(outputOptions)
-
+      if (!fs.existsSync(fullPath)) {
+        throw `No such file: ${fullPath}`
       }
+
+      let transpiled = await babel.transformFileAsync(
+        fullPath,
+        options.babelOptions,
+      )
+
+      const inputOptions = {
+        input: fullPath,
+        plugins: [
+          commonjs(),
+        ],
+      }
+
+      const outputOptions = {
+        format: 'iife',
+        file: fullPath
+      }
+
+      const bundle = await rollup.rollup(inputOptions)
+
+      await bundle.write(outputOptions)
 
     }
 
